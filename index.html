@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#58654f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="База DZIRO">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>DZIRO — База кальянщика</title>
+<style>
+  :root{
+    --bg:#e9efe2; --card:#ffffff; --card2:#e1e9d8; --line:#d3dcc8;
+    --text:#3a3935; --muted:#717a6b; --cream:#efe7dc; --sage:#c5c7b4;
+    --terra:#58654f; --olive:#7d8a73; --deep:#3f4a38; --red:#8c4f30;
+    --badge-gap:12px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 'Onest',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  button,select,input,textarea{font:inherit;color:inherit}
+  a{color:inherit;text-decoration:none}
+  [hidden]{display:none!important}
+  .appbg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+  .appbg .sign{position:absolute;width:max(120vw,480px);height:max(120vw,480px);max-width:820px;max-height:820px;right:-38%;top:22%;fill:none;stroke:#58654f;stroke-width:2.8;opacity:.18}
+  .wrap{position:relative;z-index:1;max-width:620px;margin:0 auto;padding:0 16px calc(env(safe-area-inset-bottom) + var(--badge-gap) + 96px)}
+
+  header{background:var(--terra);color:var(--cream);margin:0 -16px 16px;padding:calc(env(safe-area-inset-top) + 16px) 16px 16px;border-radius:0 0 22px 22px}
+  header .top{display:flex;align-items:center;gap:10px}
+  header .sp{flex:1}
+  .logo{display:block;height:17px;width:auto}
+  header .ttl{font-size:13px;color:var(--sage);letter-spacing:.12em;text-transform:uppercase}
+  .ed-badge{font-size:12px;padding:4px 10px;border-radius:99px;background:rgba(239,231,220,.16);border:1px solid rgba(239,231,220,.25);color:var(--cream)}
+  .search{position:relative;margin-top:14px}
+  .search input{width:100%;padding:12px 14px 12px 40px;border-radius:14px;background:rgba(239,231,220,.14);border:1px solid rgba(239,231,220,.28);color:var(--cream);font-size:16px;outline:none}
+  .search input::placeholder{color:var(--sage)}
+  .search input:focus{background:rgba(239,231,220,.22);border-color:rgba(239,231,220,.5)}
+  .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:18px;height:18px;fill:none;stroke:var(--sage);stroke-width:2;stroke-linecap:round}
+  .search .x{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--sage);font-size:20px;padding:6px 10px;cursor:pointer}
+  .syncbar{font-size:12px;color:var(--muted);text-align:center;margin:-8px 0 10px}
+  .syncbar.off{color:var(--red)}
+
+  h2{font-size:26px;font-weight:500;letter-spacing:-.01em;margin:4px 0 6px;line-height:1.15}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:14px}
+  .sec{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--olive);margin:22px 2px 8px}
+  .crumbs{display:flex;flex-wrap:wrap;gap:4px 6px;font-size:13px;color:var(--muted);margin:2px 0 6px}
+  .crumbs a{color:var(--terra);border-bottom:1px solid rgba(88,101,79,.3)}
+  .crumbs i{font-style:normal;opacity:.6}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:10px;display:block}
+  .seccard{display:flex;align-items:center;gap:14px}
+  .seccard .ic{flex:none;width:44px;height:44px;border-radius:14px;background:var(--card2);display:flex;align-items:center;justify-content:center;color:var(--terra)}
+  .seccard .ic svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .seccard .info{flex:1;min-width:0}
+  .seccard b{display:block;font-weight:500;font-size:17px;line-height:1.25}
+  .seccard span{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+  .seccard .n{flex:none;font-size:13px;color:var(--olive);background:var(--card2);border-radius:99px;padding:3px 10px}
+  .card:active,.folder:active{transform:scale(.99)}
+
+  .folders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:6px}
+  .folder{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+  .folder svg{width:22px;height:22px;fill:none;stroke:var(--terra);stroke-width:1.6;stroke-linejoin:round}
+  .folder b{font-weight:500;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
+  .folder span{font-size:12px;color:var(--muted)}
+  @media (min-width:520px){.folders{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+  .item{display:block}
+  .item .t{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+  .item .t b{font-weight:500;font-size:16px;line-height:1.3}
+  .item .t span{flex:none;font-size:11px;color:var(--muted)}
+  .item .where{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--olive);margin-top:4px}
+  .item .ex{color:var(--muted);font-size:14px;margin-top:6px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .tag{font-size:12px;padding:3px 10px;border-radius:99px;background:var(--card2);color:var(--terra);border:0;cursor:pointer}
+  .more{width:100%;padding:13px;border-radius:14px;border:1px dashed var(--olive);background:none;color:var(--terra);cursor:pointer}
+
+  .fdesc{background:var(--card2);border-radius:18px;padding:14px 16px;margin:8px 0 6px;font-size:15px}
+  .fdesc>:first-child{margin-top:0}.fdesc>:last-child{margin-bottom:0}
+  .fdesc.short{max-height:150px;overflow:hidden;position:relative}
+  .fdesc.short::after{content:"";position:absolute;left:0;right:0;bottom:0;height:56px;background:linear-gradient(transparent,var(--card2))}
+  .linkbtn{background:none;border:0;color:var(--terra);padding:4px 2px 10px;cursor:pointer;font-size:14px;font-weight:500}
+
+  .doc{padding:20px 18px}
+  .doc .where{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--olive)}
+  .doc h1{font-size:25px;font-weight:500;letter-spacing:-.01em;line-height:1.2;margin:6px 0 4px}
+  .body{font-size:15.5px;line-height:1.55;overflow-wrap:anywhere}
+  .body h2{font-size:19px;font-weight:500;margin:22px 0 6px;letter-spacing:0;color:var(--deep)}
+  .body h3{font-size:16.5px;font-weight:600;margin:18px 0 4px}
+  .body p{margin:0 0 10px}
+  .body ul,.body ol{margin:0 0 12px;padding-left:22px}
+  .body li{margin:3px 0}
+  .body li::marker{color:var(--olive)}
+  .body b{font-weight:600}
+  .body code{font-size:13px;background:var(--card2);padding:1px 6px;border-radius:6px}
+  .body a{color:var(--terra);border-bottom:1px solid rgba(88,101,79,.35)}
+  .body .tbl{overflow-x:auto;margin:6px -4px 14px;padding:0 4px}
+  .body table{border-collapse:collapse;font-size:13.5px;min-width:100%}
+  .body th,.body td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top;overflow-wrap:normal;word-break:normal;min-width:96px}
+  .body th{background:var(--card2);font-weight:500}
+  .body img{display:block;max-width:100%;height:auto;margin:12px 0;border-radius:14px;border:1px solid var(--line);background:var(--card2)}
+  .body a.file{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--card2);font-weight:500;margin:4px 0;border-bottom-width:1px}
+  .body a.file::before{content:"";width:14px;height:17px;flex:none;border:1.6px solid var(--terra);border-radius:2px 6px 2px 2px}
+  .doc .foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+  .doc .foot .upd{font-size:12px;color:var(--muted);margin-right:auto}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 16px;border-radius:14px;border:0;background:var(--terra);color:#fff;font-weight:500;font-size:15px;cursor:pointer}
+  .btn.ghost{background:var(--card2);color:var(--text)}
+  .btn.danger{background:#f3e3da;color:var(--red)}
+  .btn.wide{width:100%;padding:14px}
+  .btn:disabled{opacity:.5}
+  .addbar{display:flex;justify-content:flex-end;margin:-4px 0 10px}
+
+  .form label{display:block;font-size:13px;color:var(--muted);margin:0 0 12px}
+  .form input,.form select,.form textarea{display:block;width:100%;margin-top:5px;padding:12px 13px;border-radius:14px;border:1px solid var(--line);background:var(--card);font-size:16px;outline:none}
+  .form input:focus,.form select:focus,.form textarea:focus{border-color:var(--terra)}
+  .form textarea{min-height:46vh;resize:vertical;line-height:1.5;font-size:15px}
+  .form .hint{font-size:12px;color:var(--muted)}
+  .form .row{display:flex;gap:8px;flex-wrap:wrap}
+  .form .row .btn{flex:1}
+  .attach{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 16px}
+
+  .pinbox input{width:100%;padding:15px;border-radius:14px;border:1px solid var(--line);background:var(--card);font-size:20px;letter-spacing:.5em;text-align:center;margin:10px 0}
+  .pinbox input::placeholder{letter-spacing:.08em;font-size:16px;color:var(--muted)}
+  .err{color:var(--red);font-size:14px;min-height:20px;text-align:center;margin-top:8px}
+  .empty{color:var(--muted);text-align:center;padding:36px 10px}
+  .empty b{display:block;color:var(--text);font-weight:500;font-size:17px;margin-bottom:4px}
+  .spin{text-align:center;color:var(--muted);padding:60px 0}
+  .confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px}
+
+  nav{position:fixed;z-index:10;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + var(--badge-gap));max-width:536px;margin:0 auto;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:24px;box-shadow:0 8px 28px rgba(58,57,53,.14);display:flex;padding:4px}
+  nav a{flex:1;min-width:0;padding:8px 0;color:var(--muted);font-size:10.5px;text-align:center;white-space:nowrap}
+  nav a svg{display:block;width:22px;height:22px;margin:0 auto 3px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  nav a.on{color:var(--terra)}
+  .toast{position:fixed;z-index:20;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 96px);background:var(--deep);color:#fff;padding:10px 16px;border-radius:14px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.18);max-width:90vw;text-align:center}
+</style>
+</head>
+<body>
+<div class="appbg" id="appbg"></div>
+<div class="wrap">
+  <header>
+    <div class="top"><img class="logo" src="logo.png" alt="DZIRO"><span class="ttl">База кальянщика</span><span class="sp"></span><a class="ed-badge" id="edBadge" href="#editor" hidden>редактор</a></div>
+    <div class="search" id="searchBox">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="text" enterkeyhint="search" placeholder="Вкус, бренд, микс, правило…" aria-label="Поиск по базе" autocomplete="off">
+      <button class="x" id="qx" aria-label="Очистить" hidden>×</button>
+    </div>
+  </header>
+  <div id="sync"></div>
+  <main id="main"><div class="spin">Загрузка базы…</div></main>
+</div>
+<nav id="nav"></nav>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ====== Ссылка веб-приложения Apps Script (таблица «База кальянщика») ====== */
+const API_URL = 'https://script.google.com/macros/s/AKfycbys14AHJ9b66Mke6U1Owy-GqFU8Igav5BxC7Usj6y_CwOmkLKCkDMjbToGrLqC2jJ-L/exec';
+/* ========================================================================= */
+
+const LS = 'dziro_base';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const E = s => encodeURIComponent(s);
+const SIGN = '<svg class="sign" viewBox="40 40 448 448" aria-hidden="true"><circle cx="264" cy="172" r="120"/><circle cx="264" cy="356" r="120"/><circle cx="172" cy="264" r="120"/><circle cx="356" cy="264" r="120"/></svg>';
+const ICON = {
+  home:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>',
+  find:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/></svg>',
+  recent:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg>',
+  editor:'<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
+  folder:'<svg viewBox="0 0 24 24"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4.2l2 2h8.8A1.5 1.5 0 0 1 21 9.5v8A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/></svg>'
+};
+const SEC_ICON = name => {
+  const n = name.toLowerCase();
+  if (/таба|вкус/.test(n)) return '<svg viewBox="0 0 24 24"><path d="M12 3c3 3 5 6 5 9a5 5 0 0 1-10 0c0-3 2-6 5-9z"/><path d="M12 10v8"/></svg>';
+  if (/микс|рецеп/.test(n)) return '<svg viewBox="0 0 24 24"><path d="M6 4h12l-1.5 15a2 2 0 0 1-2 1.8h-5a2 2 0 0 1-2-1.8z"/><path d="M6.5 9h11"/></svg>';
+  if (/чай/.test(n)) return '<svg viewBox="0 0 24 24"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16M9 3v3M12 3v3"/></svg>';
+  if (/стандарт/.test(n)) return '<svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>';
+  if (/обуч|стаж/.test(n)) return '<svg viewBox="0 0 24 24"><path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v4c0 1.5 2.5 3 5 3s5-1.5 5-3v-4"/></svg>';
+  if (/реглам|правил/.test(n)) return '<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4v-.5h6V4M8.5 10h7M8.5 14h7M8.5 18h4"/></svg>';
+  if (/сервис|гост/.test(n)) return '<svg viewBox="0 0 24 24"><path d="M4 6h16v10H9l-5 4z"/></svg>';
+  if (/концеп|филос/.test(n)) return '<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><circle cx="12" cy="15" r="4"/><circle cx="9" cy="12" r="4"/><circle cx="15" cy="12" r="4"/></svg>';
+  return '<svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg>';
+};
+
+let S = { data: null, pin: null, q: '', syncing: false, offline: false, limit: 120, delAsk: false, scroll: {} };
+try { S.pin = localStorage.getItem(LS + '_pin') || null; } catch (e) {}
+
+async function api(body) {
+  const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify(body) });
+  return r.json();
+}
+function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 2600); }
+
+/* ---------- Данные ---------- */
+function saveCache(d) { try { localStorage.setItem(LS + '_data', JSON.stringify({ at: Date.now(), d })); } catch (e) {} }
+function readCache() { try { const c = JSON.parse(localStorage.getItem(LS + '_data') || 'null'); if (c && c.d) return c.d; } catch (e) {} return null; }
+function setData(d) { S.data = d; S.secs = d.sections || []; S.folders = d.folders || []; S.arts = d.articles || []; }
+
+async function load() {
+  const cached = readCache();
+  if (cached) { setData(cached); S.syncing = true; render(); }
+  try {
+    const r = await api({ action: 'data' });
+    if (!r.ok) throw new Error(r.error || 'Ошибка');
+    S.syncing = false; S.offline = false;
+    setData(r.data); saveCache(r.data); render(true);
+  } catch (e) {
+    S.syncing = false;
+    if (S.data) { S.offline = true; render(true); }
+    else $('#main').innerHTML = `<div class="empty"><b>Нет связи с сервером</b>Проверь интернет и попробуй ещё раз<br><br><button class="btn" onclick="load()">Повторить</button></div>`;
+  }
+}
+
+/* ---------- Разметка текста ---------- */
+function inline(s) {
+  s = esc(s);
+  return s.replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+    .replace(/(^|[\s(])_([^_]+)_/g, '$1<i>$2</i>')
+    .replace(/!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener" style="border:0"><img src="$2" alt="$1" loading="lazy"></a>')
+    .replace(/\[Файл: ([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a class="file" href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/(^|[\s(])(https?:\/\/[^\s<]+)/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+}
+function md(src) {
+  const lines = String(src || '').split(/\r?\n/); let out = '', list = null, para = [], tbl = [];
+  const flushP = () => { if (para.length) { out += '<p>' + para.map(inline).join('<br>') + '</p>'; para = []; } };
+  const flushL = () => { if (list) { out += '</' + list + '>'; list = null; } };
+  const flushT = () => { if (tbl.length) {
+    const rows = tbl.filter(r => !/^\s*\|?\s*:?-{2,}/.test(r)).map(r => r.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim()));
+    out += '<div class="tbl"><table>' + rows.map((r, i) => '<tr>' + r.map(c => i ? `<td>${inline(c)}</td>` : `<th>${inline(c)}</th>`).join('') + '</tr>').join('') + '</table></div>'; tbl = []; } };
+  for (const l of lines) {
+    if (/^\s*\|/.test(l)) { flushP(); flushL(); tbl.push(l); continue; } else flushT();
+    let m;
+    if ((m = l.match(/^(#{1,3})\s+(.*)/))) { flushP(); flushL(); const h = m[1].length === 1 ? 2 : 3; out += `<h${h}>${inline(m[2])}</h${h}>`; }
+    else if ((m = l.match(/^\s*[-*•]\s+(.*)/))) { flushP(); if (list !== 'ul') { flushL(); out += '<ul>'; list = 'ul'; } out += `<li>${inline(m[1])}</li>`; }
+    else if ((m = l.match(/^\s*(\d+)[.)]\s+(.*)/))) { flushP(); if (list !== 'ol') { flushL(); out += '<ol>'; list = 'ol'; } out += `<li value="${m[1]}">${inline(m[2])}</li>`; }
+    else if (!l.trim()) { flushP(); flushL(); }
+    else { flushL(); para.push(l); }
+  }
+  flushP(); flushL(); flushT(); return out;
+}
+const plain = s => String(s || '').replace(/!\[[^\]]*\]\([^)]*\)/g, ' ').replace(/\[(?:Файл: )?([^\]]*)\]\([^)]*\)/g, '$1').replace(/[#*_`|>-]/g, ' ').replace(/\s+/g, ' ').trim();
+const fmtDate = t => t ? new Date(t).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+function plural(n) { const m = n % 10, h = n % 100; return m === 1 && h !== 11 ? 'статья' : m >= 2 && m <= 4 && (h < 12 || h > 14) ? 'статьи' : 'статей'; }
+
+/* ---------- Папки ---------- */
+const byOrder = (a, b) => (a.order || 0) - (b.order || 0);
+const byTitle = (a, b) => (a.title || '').localeCompare(b.title || '', 'ru');
+function foldersOf(sec) {
+  const names = S.folders.filter(f => f.section === sec).map(f => f.name);
+  S.arts.forEach(a => { if (a.section === sec && a.folder && !names.includes(a.folder)) names.push(a.folder); });
+  return names;
+}
+function topFolders(names) { const out = []; names.forEach(n => { const p = n.split('/')[0]; if (!out.includes(p)) out.push(p); }); return out; }
+function childFolders(P, names) { const out = []; names.forEach(n => { if (n.indexOf(P + '/') === 0) { const p = P + '/' + n.slice(P.length + 1).split('/')[0]; if (!out.includes(p)) out.push(p); } }); return out; }
+const inFolder = (a, P) => a.folder === P || (a.folder || '').indexOf(P + '/') === 0;
+
+/* ---------- Маршруты ---------- */
+function route() {
+  const h = location.hash.replace(/^#\/?/, '');
+  const p = h.split('/').map(x => { try { return decodeURIComponent(x); } catch (e) { return x; } });
+  return { v: p[0] || 'home', a: p[1] || '', b: p[2] || '' };
+}
+const secHref = (sec, folder) => '#s/' + E(sec) + (folder ? '/' + E(folder) : '');
+const go = h => { location.hash = h; };
+
+/* ---------- Отрисовка ---------- */
+function render(keepScroll) {
+  const r = route();
+  const tab = { home: 'home', s: 'home', a: 'home', find: 'find', recent: 'recent', editor: 'editor', e: 'editor', new: 'editor' }[r.v] || 'home';
+  const tabs = [['home', '#', 'Разделы'], ['find', '#find', 'Поиск'], ['recent', '#recent', 'Новое'], ['editor', '#editor', S.pin ? 'Редактор' : 'Вход']];
+  $('#nav').innerHTML = tabs.map(([k, h, t]) => `<a href="${h}" class="${tab === k ? 'on' : ''}">${ICON[k]}${t}</a>`).join('');
+  $('#edBadge').hidden = !S.pin;
+  $('#searchBox').hidden = ['e', 'new', 'editor'].includes(r.v);
+  $('#sync').innerHTML = S.syncing ? '<div class="syncbar">обновляю…</div>' : S.offline ? '<div class="syncbar off">нет связи — показана сохранённая база</div>' : '';
+  if (!S.data) { $('#main').innerHTML = '<div class="spin">Загрузка базы…</div>'; return; }
+  const view = { home: viewHome, s: viewSection, a: viewDoc, find: viewFind, recent: viewRecent, editor: viewEditor, e: viewEdit, new: viewEdit }[r.v] || viewHome;
+  const y = window.scrollY;
+  $('#main').innerHTML = view(r);
+  if (keepScroll) window.scrollTo(0, y);
+  if (r.v === 'e' || r.v === 'new') bindEdit();
+}
+
+function itemHtml(a, showWhere) {
+  const where = [a.section, a.folder].filter(Boolean).join(' · ');
+  return `<a class="card item" href="#a/${E(a.id)}">
+    <div class="t"><b>${esc(a.title)}</b><span>${fmtDate(a.updatedAt)}</span></div>
+    ${showWhere ? `<div class="where">${esc(where)}</div>` : ''}
+    <div class="ex">${esc(plain(a.body).slice(0, 200))}</div></a>`;
+}
+function listHtml(list, showWhere) {
+  const shown = list.slice(0, S.limit);
+  return shown.map(a => itemHtml(a, showWhere)).join('') +
+    (list.length > shown.length ? `<button class="more" onclick="S.limit+=150;render(true)">Показать ещё (${list.length - shown.length})</button>` : '');
+}
+function folderCards(sec, paths, inSec) {
+  return '<div class="folders">' + paths.map(p => {
+    const c = inSec.filter(a => inFolder(a, p)).length;
+    return `<a class="folder" href="${secHref(sec, p)}">${ICON.folder}<b>${esc(p.split('/').pop())}</b><span>${c} ${plural(c)}</span></a>`;
+  }).join('') + '</div>';
+}
+const addBtn = (sec, folder) => S.pin ? `<div class="addbar"><a class="btn" href="#new/${E(sec || '')}/${E(folder || '')}">+ Статья</a></div>` : '';
+
+function viewHome() {
+  const cnt = n => S.arts.filter(a => a.section === n).length;
+  const recent = [...S.arts].filter(a => a.updatedAt).sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 4);
+  return `<h2>Разделы</h2><div class="sub">${S.arts.length} ${plural(S.arts.length)} в базе</div>` +
+    S.secs.map(s => `<a class="card seccard" href="${secHref(s.name)}"><span class="ic">${SEC_ICON(s.name)}</span>
+      <span class="info"><b>${esc(s.name)}</b>${s.sub ? `<span>${esc(s.sub)}</span>` : ''}</span><span class="n">${cnt(s.name)}</span></a>`).join('') +
+    (recent.length ? '<div class="sec">Недавно обновлено</div>' + recent.map(a => itemHtml(a, true)).join('') : '');
+}
+
+function crumbs(sec, P) {
+  const parts = ['<a href="#">Разделы</a>'];
+  if (P) {
+    parts.push(`<a href="${secHref(sec)}">${esc(sec)}</a>`);
+    const segs = P.split('/');
+    segs.slice(0, -1).forEach((s, i) => parts.push(`<a href="${secHref(sec, segs.slice(0, i + 1).join('/'))}">${esc(s)}</a>`));
+  }
+  return `<div class="crumbs">${parts.join('<i>/</i>')}</div>`;
+}
+function fdesc(text) {
+  if (!text) return '';
+  const long = text.length > 420;
+  return `<div class="fdesc body ${long ? 'short' : ''}" id="fd">${md(text)}</div>` +
+    (long ? `<button class="linkbtn" onclick="this.previousElementSibling.classList.remove('short');this.remove()">Читать полностью</button>` : '');
+}
+function viewSection(r) {
+  const sec = S.secs.find(s => s.name === r.a);
+  if (!sec) return `<div class="empty"><b>Раздел не найден</b><a class="btn" href="#">К разделам</a></div>`;
+  const P = r.b;
+  const inSec = S.arts.filter(a => a.section === sec.name);
+  const names = foldersOf(sec.name);
+  let out = crumbs(sec.name, P);
+  if (P) {
+    const f = S.folders.find(x => x.section === sec.name && x.name === P);
+    const list = inSec.filter(a => a.folder === P).sort(byOrder);
+    const kids = childFolders(P, names);
+    out += `<h2>${esc(P.split('/').pop())}</h2>` + fdesc(f && f.desc) + addBtn(sec.name, P);
+    if (kids.length) out += (list.length ? '<div class="sec">Папки</div>' : '<div style="height:8px"></div>') + folderCards(sec.name, kids, inSec);
+    if (list.length) out += (kids.length ? '<div class="sec">Статьи</div>' : '<div style="height:8px"></div>') + listHtml(list, false);
+    if (!kids.length && !list.length) out += emptyHtml();
+    return out;
+  }
+  const loose = inSec.filter(a => !a.folder || !names.includes(a.folder)).sort(byOrder);
+  out += `<h2>${esc(sec.name)}</h2>${sec.sub ? `<div class="sub">${esc(sec.sub)}</div>` : ''}` + addBtn(sec.name, '');
+  if (names.length) out += '<div class="sec">Папки</div>' + folderCards(sec.name, topFolders(names), inSec);
+  if (loose.length) out += (names.length ? '<div class="sec">Общее</div>' : '') + listHtml(loose, false);
+  if (!names.length && !loose.length) out += emptyHtml();
+  return out;
+}
+function emptyHtml(q) {
+  return `<div class="empty"><b>${q ? 'Ничего не нашлось' : 'Здесь пока пусто'}</b>${q ? 'Попробуй другое слово: название вкуса, бренда или правила.' : S.pin ? 'Нажми «+ Статья», чтобы добавить первую запись.' : 'Скоро здесь появятся материалы.'}</div>`;
+}
+
+function viewDoc(r) {
+  const a = S.arts.find(x => x.id === r.a);
+  if (!a) return `<div class="empty"><b>Статья не найдена</b>Возможно, её удалили<br><br><a class="btn" href="#">К разделам</a></div>`;
+  const parts = ['<a href="#">Разделы</a>', `<a href="${secHref(a.section)}">${esc(a.section)}</a>`];
+  if (a.folder) { const segs = a.folder.split('/'); segs.forEach((s, i) => parts.push(`<a href="${secHref(a.section, segs.slice(0, i + 1).join('/'))}">${esc(s)}</a>`)); }
+  return `<div class="crumbs">${parts.join('<i>/</i>')}</div>` +
+    `<article class="card doc"><div class="where">${esc([a.section, a.folder].filter(Boolean).join(' · '))}</div><h1>${esc(a.title)}</h1>
+    ${(a.tags || []).length ? `<div class="tags" style="margin:8px 0 14px">${a.tags.map(t => `<button class="tag" onclick="findTag(this.textContent)">${esc(t)}</button>`).join('')}</div>` : '<div style="height:10px"></div>'}
+    <div class="body">${md(a.body)}</div>
+    <div class="foot"><span class="upd">Обновлено ${fmtDate(a.updatedAt)}</span>
+    ${S.pin ? (S.delAsk ? `<span class="confirm">Удалить статью? <button class="btn danger" onclick="delArticle('${esc(a.id)}',this)">Да</button><button class="btn ghost" onclick="S.delAsk=false;render(true)">Нет</button></span>`
+      : `<a class="btn ghost" href="#e/${E(a.id)}">Редактировать</a><button class="btn danger" onclick="S.delAsk=true;render(true)">Удалить</button>`) : ''}</div></article>`;
+}
+
+function search(q) {
+  const ws = q.toLowerCase().split(/\s+/).filter(Boolean);
+  return S.arts.filter(a => { const hay = (a.title + ' ' + a.section + ' ' + (a.folder || '') + ' ' + (a.tags || []).join(' ') + ' ' + a.body).toLowerCase(); return ws.every(w => hay.includes(w)); })
+    .sort((a, b) => { const t = ws[0]; const ia = a.title.toLowerCase().includes(t) ? 0 : 1, ib = b.title.toLowerCase().includes(t) ? 0 : 1; return ia - ib || byTitle(a, b); });
+}
+function viewFind() {
+  const q = S.q.trim();
+  if (!q) {
+    const cnt = {}; S.arts.forEach(a => (a.tags || []).forEach(t => { cnt[t] = (cnt[t] || 0) + 1; }));
+    const top = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a]).slice(0, 24);
+    return `<h2>Поиск</h2><div class="sub">Ищет по названиям, тегам, папкам и тексту статей</div>` +
+      (top.length ? '<div class="sec">Частые теги</div><div class="tags">' + top.map(t => `<button class="tag" onclick="findTag(this.textContent)">${esc(t)}</button>`).join('') + '</div>' : '');
+  }
+  const list = search(q);
+  return `<h2>Поиск</h2><div class="sub">«${esc(q)}» — ${list.length} ${plural(list.length)}</div>` + (list.length ? listHtml(list, true) : emptyHtml(true));
+}
+function findTag(t) { S.q = t; $('#q').value = t; $('#qx').hidden = false; S.limit = 120; if (route().v !== 'find') go('#find'); else render(); window.scrollTo(0, 0); }
+
+function viewRecent() {
+  const list = [...S.arts].filter(a => a.updatedAt).sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 40);
+  return `<h2>Новое</h2><div class="sub">Последние добавленные и изменённые статьи</div>` + (list.length ? list.map(a => itemHtml(a, true)).join('') : emptyHtml());
+}
+
+function viewEditor() {
+  if (S.pin) return `<h2>Редактор</h2><div class="sub">Режим редактора включён на этом устройстве</div>
+    <div class="card"><b style="font-weight:500">Как добавить статью</b><div class="sub" style="margin:4px 0 12px">Открой раздел или папку и нажми «+ Статья». Внутри статьи — «Редактировать» и «Удалить».</div>
+    <a class="btn wide" href="#new//">+ Новая статья</a></div>
+    <button class="btn ghost wide" onclick="logoutEd()">Выйти из режима редактора</button>`;
+  return `<h2>Вход для редактора</h2><div class="sub">Смотреть базу может каждый. Добавлять и править статьи — только по коду редактора.</div>
+    <div class="card pinbox"><input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="Код редактора" onkeydown="if(event.key==='Enter')loginEd()">
+    <button class="btn wide" id="pinGo" onclick="loginEd()">Войти</button><div class="err" id="pinErr"></div></div>`;
+}
+async function loginEd() {
+  const v = ($('#pin').value || '').trim(); if (!v) return;
+  $('#pinGo').disabled = true; $('#pinErr').textContent = '';
+  try {
+    const r = await api({ action: 'check', pin: v });
+    if (r.ok && r.valid) { S.pin = v; try { localStorage.setItem(LS + '_pin', v); } catch (e) {} toast('Режим редактора включён'); render(); }
+    else { $('#pinErr').textContent = r.error || 'Неверный код'; $('#pinGo').disabled = false; }
+  } catch (e) { $('#pinErr').textContent = 'Нет связи с сервером'; $('#pinGo').disabled = false; }
+}
+function logoutEd() { S.pin = null; try { localStorage.removeItem(LS + '_pin'); } catch (e) {} toast('Вы вышли из режима редактора'); render(); }
+function onErr(msg) {
+  if (/код редактора/i.test(msg || '')) { S.pin = null; try { localStorage.removeItem(LS + '_pin'); } catch (e) {} toast('Код редактора изменился — войди заново'); go('#editor'); return; }
+  toast(msg || 'Не получилось. Попробуй ещё раз');
+}
+
+/* ---------- Редактирование ---------- */
+function viewEdit(r) {
+  if (!S.pin) return `<div class="empty"><b>Нужен вход редактора</b><br><a class="btn" href="#editor">Войти</a></div>`;
+  const isNew = r.v === 'new';
+  const a = isNew ? { title: '', section: S.secs.some(s => s.name === r.a) ? r.a : (S.secs[0] || {}).name, folder: r.b || '', tags: [], body: '' } : S.arts.find(x => x.id === r.a);
+  if (!a) return `<div class="empty"><b>Статья не найдена</b></div>`;
+  return `<h2>${isNew ? 'Новая статья' : 'Редактирование'}</h2><div class="sub">${isNew ? 'Заполни поля и нажми «Сохранить»' : esc(a.title)}</div>
+  <form class="form" id="form" data-id="${isNew ? '' : esc(a.id)}">
+    <label>Название<input id="f-title" required maxlength="140" value="${esc(a.title)}" placeholder="Например: Deus — Buio"></label>
+    <label>Раздел<select id="f-sec">${S.secs.map(s => `<option ${s.name === a.section ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select></label>
+    <label>Папка <span class="hint">— необязательно, выбери или впиши новую (вложенная: «Сарма/360 лёгкая»)</span><input id="f-folder" list="folderlist" value="${esc(a.folder || '')}" placeholder="Без папки"><datalist id="folderlist">${foldersOf(a.section).map(n => `<option value="${esc(n)}">`).join('')}</datalist></label>
+    <label>Теги <span class="hint">— через запятую, помогают в поиске</span><input id="f-tags" value="${esc((a.tags || []).join(', '))}" placeholder="Deus, ягоды, лёгкий"></label>
+    <label>Текст <span class="hint"># заголовок · - пункт · 1. шаг · **жирный** · | таблица |</span><textarea id="f-body">${esc(a.body)}</textarea></label>
+    <div class="attach"><button class="btn ghost" type="button" onclick="$('#f-file').click()">Прикрепить фото или файл</button><input type="file" id="f-file" multiple hidden><span class="hint" id="f-upl">Фото встанет картинкой, остальное — ссылкой. До 25 МБ.</span></div>
+    <div class="row"><button class="btn" type="submit" id="save">Сохранить</button><button class="btn ghost" type="button" onclick="history.back()">Отмена</button></div>
+  </form>`;
+}
+function bindEdit() {
+  const f = $('#form'); if (!f) return;
+  $('#f-sec').onchange = () => { $('#folderlist').innerHTML = foldersOf($('#f-sec').value).map(n => `<option value="${esc(n)}">`).join(''); };
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const art = { id: f.dataset.id || null, title: $('#f-title').value.trim(), section: $('#f-sec').value, folder: $('#f-folder').value.trim(),
+      tags: $('#f-tags').value.split(',').map(s => s.trim()).filter(Boolean), body: $('#f-body').value };
+    if (!art.title) return;
+    $('#save').disabled = true; $('#save').textContent = 'Сохраняю…';
+    try {
+      const r = await api({ action: 'save', pin: S.pin, article: art });
+      if (!r.ok) { $('#save').disabled = false; $('#save').textContent = 'Сохранить'; return onErr(r.error); }
+      setData(r.data); saveCache(r.data); toast('Сохранено');
+      location.replace('#a/' + E(r.id));
+    } catch (err) { $('#save').disabled = false; $('#save').textContent = 'Сохранить'; toast('Нет связи — статья не сохранена'); }
+  };
+  $('#f-file').onchange = e => {
+    const files = [...e.target.files]; e.target.value = '';
+    const status = $('#f-upl'); let left = files.length;
+    files.forEach(file => {
+      if (file.size > 25 * 1024 * 1024) { toast('«' + file.name + '» больше 25 МБ'); left--; return; }
+      status.textContent = 'Загружаю: ' + file.name + '…';
+      const rd = new FileReader();
+      rd.onload = async () => {
+        try {
+          const r = await api({ action: 'upload', pin: S.pin, name: file.name, type: file.type, data: String(rd.result).split(',')[1] });
+          if (!r.ok) { left--; status.textContent = 'Не получилось загрузить «' + file.name + '»'; return onErr(r.error); }
+          const ta = $('#f-body'); if (!ta) return;
+          const snip = r.file.isImage ? `![${r.file.name}](https://lh3.googleusercontent.com/d/${r.file.id})` : `[Файл: ${r.file.name}](https://drive.google.com/file/d/${r.file.id}/view)`;
+          const pos = ta.selectionStart ?? ta.value.length, before = ta.value.slice(0, pos), after = ta.value.slice(pos);
+          const ins = (before && !before.endsWith('\n') ? '\n' : '') + snip + '\n';
+          ta.value = before + ins + after; ta.selectionStart = ta.selectionEnd = pos + ins.length;
+          if (--left <= 0) status.textContent = 'Готово. Не забудь нажать «Сохранить».';
+        } catch (err) { left--; status.textContent = 'Нет связи — «' + file.name + '» не загружен'; }
+      };
+      rd.readAsDataURL(file);
+    });
+  };
+}
+async function delArticle(id, b) {
+  b.disabled = true;
+  try {
+    const r = await api({ action: 'delete', pin: S.pin, id });
+    if (!r.ok) { b.disabled = false; return onErr(r.error); }
+    const a = S.arts.find(x => x.id === id);
+    setData(r.data); saveCache(r.data); S.delAsk = false; toast('Статья удалена');
+    location.replace(a ? secHref(a.section, a.folder) : '#');
+  } catch (e) { b.disabled = false; toast('Нет связи — статья не удалена'); }
+}
+
+/* ---------- События ---------- */
+let curHash = location.hash;
+window.addEventListener('scroll', () => { S.scroll[curHash] = window.scrollY; }, { passive: true });
+window.addEventListener('hashchange', () => {
+  curHash = location.hash; S.delAsk = false; S.limit = 120;
+  render(); window.scrollTo(0, S.scroll[curHash] || 0);
+});
+let qt;
+$('#q').addEventListener('input', () => {
+  $('#qx').hidden = !$('#q').value;
+  clearTimeout(qt); qt = setTimeout(() => { S.q = $('#q').value; S.limit = 120; if (route().v !== 'find') go('#find'); else render(); }, 150);
+});
+$('#q').addEventListener('keydown', e => { if (e.key === 'Enter') $('#q').blur(); });
+$('#qx').onclick = () => { $('#q').value = ''; S.q = ''; $('#qx').hidden = true; if (route().v === 'find') render(); $('#q').focus(); };
+document.addEventListener('click', e => { const a = e.target.closest('nav a[href="#find"]'); if (a) setTimeout(() => $('#q').focus(), 50); });
+
+$('#appbg').innerHTML = SIGN;
+render(); load();
+</script>
+</body>
+</html>
