@@ -49,6 +49,9 @@
   h2{font-size:26px;font-weight:500;letter-spacing:-.01em;margin:4px 0 6px;line-height:1.15}
   .sub{color:var(--muted);font-size:14px;margin-bottom:14px}
   .sec{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--olive);margin:22px 2px 8px}
+  .back{display:inline-flex;align-items:center;gap:4px;max-width:100%;padding:9px 16px 9px 10px;margin:0 0 12px;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--terra);font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .back svg{flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .back:active{transform:scale(.97)}
   .crumbs{display:flex;flex-wrap:wrap;gap:4px 6px;font-size:13px;color:var(--muted);margin:2px 0 6px}
   .crumbs a{color:var(--terra);border-bottom:1px solid rgba(88,101,79,.3)}
   .crumbs i{font-style:normal;opacity:.6}
@@ -316,14 +319,13 @@ function viewHome() {
     (recent.length ? '<div class="sec">Недавно обновлено</div>' + recent.map(a => itemHtml(a, true)).join('') : '');
 }
 
+function backBtn(href, label) {
+  return `<a class="back" href="${href}"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>${esc(label)}</a>`;
+}
 function crumbs(sec, P) {
-  const parts = ['<a href="#">Разделы</a>'];
-  if (P) {
-    parts.push(`<a href="${secHref(sec)}">${esc(sec)}</a>`);
-    const segs = P.split('/');
-    segs.slice(0, -1).forEach((s, i) => parts.push(`<a href="${secHref(sec, segs.slice(0, i + 1).join('/'))}">${esc(s)}</a>`));
-  }
-  return `<div class="crumbs">${parts.join('<i>/</i>')}</div>`;
+  if (!P) return backBtn('#', 'Разделы');
+  const i = P.lastIndexOf('/');
+  return i < 0 ? backBtn(secHref(sec), sec) : backBtn(secHref(sec, P.slice(0, i)), P.slice(0, i).split('/').pop());
 }
 function fdesc(text) {
   if (!text) return '';
@@ -362,9 +364,7 @@ function emptyHtml(q) {
 function viewDoc(r) {
   const a = S.arts.find(x => x.id === r.a);
   if (!a) return `<div class="empty"><b>Статья не найдена</b>Возможно, её удалили<br><br><a class="btn" href="#">К разделам</a></div>`;
-  const parts = ['<a href="#">Разделы</a>', `<a href="${secHref(a.section)}">${esc(a.section)}</a>`];
-  if (a.folder) { const segs = a.folder.split('/'); segs.forEach((s, i) => parts.push(`<a href="${secHref(a.section, segs.slice(0, i + 1).join('/'))}">${esc(s)}</a>`)); }
-  return `<div class="crumbs">${parts.join('<i>/</i>')}</div>` +
+  return (a.folder ? backBtn(secHref(a.section, a.folder), a.folder.split('/').pop()) : backBtn(secHref(a.section), a.section)) +
     `<article class="card doc"><div class="where">${esc([a.section, a.folder].filter(Boolean).join(' · '))}</div><h1>${esc(a.title)}</h1>
     ${(a.tags || []).length ? `<div class="tags" style="margin:8px 0 14px">${a.tags.map(t => `<button class="tag" onclick="findTag(this.textContent)">${esc(t)}</button>`).join('')}</div>` : '<div style="height:10px"></div>'}
     <div class="body">${md(a.body)}</div>
