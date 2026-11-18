@@ -509,7 +509,7 @@ function viewAcc(r) {
   const roles = ROLE_LIST.filter(x => x !== 'Менеджер' || owner);
   return backBtn('#team', 'Команда') + `<h2>${r.a ? esc(a.name) : 'Новый человек'}</h2><div class="sub">${r.a ? 'Изменить роль, код или отключить доступ' : 'Код передай человеку лично'}</div>
   <form class="form" id="accForm" data-orig="${esc(r.a || '')}">
-    <label>Имя и фамилия<input id="a-name" required maxlength="60" value="${esc(a.name)}" placeholder="Например: Анна Смирнова"></label>
+    <label>Имя и фамилия<input id="a-name" required maxlength="60" value="${esc(a.name)}" placeholder="Например: Семён Гиренко"></label>
     <label>Роль<select id="a-role">${roles.map(x => `<option ${x === a.role ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
     <label id="a-progw" ${a.role === 'Стажёр' ? '' : 'hidden'}>Программа обучения<select id="a-prog">${PROG_LIST.map(x => `<option ${x === a.program ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
     <label>Код для входа <span class="hint">— 4–8 цифр${r.a ? ', оставь пустым, чтобы не менять' : ''}</span><input id="a-code" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="${r.a ? '••••' : 'Например: 4821'}"></label>
