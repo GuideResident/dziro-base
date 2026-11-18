@@ -32,10 +32,10 @@
   .wrap{position:relative;z-index:1;max-width:620px;margin:0 auto;padding:0 16px calc(env(safe-area-inset-bottom) + var(--badge-gap) + 96px)}
 
   header{background:var(--terra);color:var(--cream);margin:0 -16px 16px;padding:calc(env(safe-area-inset-top) + 16px) 16px 16px;border-radius:0 0 22px 22px}
-  header .top{display:flex;align-items:center;gap:10px}
+  header .top{display:flex;align-items:center;gap:12px}
   header .sp{flex:1}
   .logo{display:block;height:17px;width:auto}
-  header .ttl{font-size:13px;color:var(--sage);letter-spacing:.12em;text-transform:uppercase}
+  header .ttl{font-size:13px;color:var(--sage);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .ed-badge{font-size:12px;padding:4px 10px;border-radius:99px;background:rgba(239,231,220,.16);border:1px solid rgba(239,231,220,.25);color:var(--cream)}
   .search{position:relative;margin-top:14px}
   .search input{width:100%;padding:12px 14px 12px 40px;border-radius:14px;background:rgba(239,231,220,.14);border:1px solid rgba(239,231,220,.28);color:var(--cream);font-size:16px;outline:none}
@@ -172,6 +172,16 @@
   .it .mat{flex:none;font-size:12px;color:var(--terra);border:1px solid var(--line);border-radius:99px;padding:3px 9px;background:var(--card2)}
   .form .chk{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--text)}
   .form .chk input{width:20px;height:20px;margin:0;display:inline-block}
+  .bell{position:relative;color:var(--cream);padding:4px 2px;display:flex}
+  .bell svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .bell b{position:absolute;top:-2px;right:-6px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#d9773f;color:#fff;font-size:11px;font-weight:600;line-height:17px;text-align:center}
+  .note{display:flex;align-items:flex-start;gap:12px;position:relative}
+  .note .nic{flex:none;width:36px;height:36px;border-radius:12px;background:var(--card2);display:flex;align-items:center;justify-content:center;color:var(--terra)}
+  .note .nic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .note .ntx{flex:1;min-width:0;font-size:15px;line-height:1.35;padding-top:2px}
+  .note .ntx small{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+  .note.new{border-color:var(--terra)}
+  .note .ndot{position:absolute;top:12px;right:12px;width:8px;height:8px;border-radius:50%;background:#d9773f}
   .toast{position:fixed;z-index:20;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 96px);background:var(--deep);color:#fff;padding:10px 16px;border-radius:14px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.18);max-width:90vw;text-align:center}
 </style>
 </head>
@@ -179,7 +189,7 @@
 <div class="appbg" id="appbg"></div>
 <div class="wrap">
   <header>
-    <div class="top"><img class="logo" src="logo.png" alt="DZIRO"><span class="ttl">База кальянщика</span><span class="sp"></span><a class="ed-badge" id="edBadge" href="#me" hidden></a></div>
+    <div class="top"><img class="logo" src="logo.png" alt="DZIRO"><span class="ttl">База кальянщика</span><span class="sp"></span><a class="bell" id="bell" href="#notes" hidden aria-label="Уведомления"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><b id="bellN" hidden></b></a><a class="ed-badge" id="edBadge" href="#me" hidden></a></div>
     <div class="search" id="searchBox">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="q" type="text" enterkeyhint="search" placeholder="Вкус, бренд, микс, правило…" aria-label="Поиск по базе" autocomplete="off">
@@ -315,10 +325,11 @@ function render(keepScroll) {
   const tabs = [['home', '#', 'Разделы'], ['find', '#find', 'Поиск'], ['recent', '#recent', 'Новое'], ['att', '#att', 'Аттестация'], ['me', '#me', S.user ? 'Профиль' : 'Вход']];
   $('#nav').innerHTML = tabs.map(([k, h, t]) => `<a href="${h}" class="${tab === k ? 'on' : ''}">${ICON[k]}${t}</a>`).join('');
   $('#edBadge').hidden = !S.user; if (S.user) $('#edBadge').textContent = S.user.name.split(' ')[0];
-  $('#searchBox').hidden = ['e', 'new', 'editor', 'me', 'att', 'team', 'acc'].includes(r.v);
+  updateBell();
+  $('#searchBox').hidden = ['e', 'new', 'editor', 'me', 'att', 'team', 'acc', 'notes'].includes(r.v);
   $('#sync').innerHTML = S.syncing ? '<div class="syncbar">обновляю…</div>' : S.offline ? '<div class="syncbar off">нет связи — показана сохранённая база</div>' : '';
   if (!S.data) { $('#main').innerHTML = '<div class="spin">Загрузка базы…</div>'; return; }
-  const view = { home: viewHome, s: viewSection, a: viewDoc, find: viewFind, recent: viewRecent, editor: viewMe, me: viewMe, att: viewAtt, team: viewTeam, acc: viewAcc, e: viewEdit, new: viewEdit }[r.v] || viewHome;
+  const view = { notes: viewNotes, home: viewHome, s: viewSection, a: viewDoc, find: viewFind, recent: viewRecent, editor: viewMe, me: viewMe, att: viewAtt, team: viewTeam, acc: viewAcc, e: viewEdit, new: viewEdit }[r.v] || viewHome;
   const y = window.scrollY;
   $('#main').innerHTML = view(r);
   if (keepScroll) window.scrollTo(0, y);
@@ -532,6 +543,45 @@ function bindAcc() {
       S.accs = r.accounts; S.names = null; S.att = {}; toast('Сохранено'); location.replace('#team');
     } catch (err) { $('#a-save').disabled = false; $('#a-err').textContent = 'Нет связи с сервером'; }
   };
+}
+
+/* ---------- Уведомления ---------- */
+const seenKey = () => LS + '_seen_' + (S.user ? S.user.name : '');
+function seenGet() { try { return JSON.parse(localStorage.getItem(seenKey()) || 'null'); } catch (e) { return null; } }
+function seenPut(v) { try { localStorage.setItem(seenKey(), JSON.stringify(v)); } catch (e) {} }
+function computeNotes() {
+  const d = S.att && S.att[''];
+  if (!S.user || S.user.mgr || !d || !d.items) return [];
+  const out = [];
+  d.items.forEach(x => { const dd = (d.done || {})[x.id]; if (dd) out.push({ key: 'att:' + x.id, at: dd.at || 0,
+    t: `Сдан пункт «${esc(x.title)}»${dd.by ? ' — принял(а) ' + esc(dd.by) : ''}`, sub: esc(x.block) }); });
+  const total = d.items.length, n = out.length;
+  if (total && n === total) out.push({ key: 'att:all', at: Date.now(), t: 'Аттестация пройдена полностью!', sub: esc(d.person.program) });
+  let s = seenGet();
+  if (!s) { s = { k: {} }; out.forEach(o => { s.k[o.key] = 1; }); seenPut(s); }
+  out.forEach(o => { o.unread = !s.k[o.key]; });
+  return out.sort((a, b) => (b.unread - a.unread) || (b.at - a.at));
+}
+function viewNotes() {
+  if (!S.user) return loginForm('Уведомления', 'Войди, чтобы видеть свои уведомления.');
+  if (S.user.mgr) return '<h2>Уведомления</h2><div class="empty">Для менеджеров пока нет уведомлений</div>';
+  if (!S.att['']) { loadAtt(''); return '<div class="spin">Загрузка…</div>'; }
+  const list = computeNotes();
+  setTimeout(() => { const s = seenGet() || { k: {} }; list.forEach(o => { s.k[o.key] = 1; }); seenPut(s); $('#bellN').hidden = true; }, 0);
+  const card = o => `<a class="card note ${o.unread ? 'new' : ''}" href="#att"><span class="nic">${ICON.att}</span><span class="ntx">${o.t}<small>${o.sub}</small></span>${o.unread ? '<i class="ndot"></i>' : ''}</a>`;
+  const un = list.filter(o => o.unread), rest = list.filter(o => !o.unread);
+  return '<h2>Уведомления</h2><div class="sub">Сданные пункты аттестации</div>' + (list.length ?
+    (un.length ? '<div class="sec">Новое</div>' + un.map(card).join('') : '') + (rest.length ? '<div class="sec">Ранее</div>' + rest.map(card).join('') : '')
+    : '<div class="empty">Пока ничего нового</div>');
+}
+function updateBell() {
+  const show = !!(S.user && !S.user.mgr);
+  $('#bell').hidden = !show;
+  if (!show) return;
+  if (!S.att[''] && !S.attLoading) { S.attLoading = true; loadAtt('').finally(() => { S.attLoading = false; }); }
+  const n = computeNotes().filter(o => o.unread).length;
+  $('#bellN').hidden = !n; $('#bellN').textContent = n;
+  try { if (navigator.setAppBadge) n ? navigator.setAppBadge(n) : navigator.clearAppBadge(); } catch (e) {}
 }
 
 /* ---------- Аттестация ---------- */
