@@ -137,9 +137,41 @@
   .confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px}
 
   nav{position:fixed;z-index:10;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + var(--badge-gap));max-width:536px;margin:0 auto;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:24px;box-shadow:0 8px 28px rgba(58,57,53,.14);display:flex;padding:4px}
-  nav a{flex:1;min-width:0;padding:8px 0;color:var(--muted);font-size:10.5px;text-align:center;white-space:nowrap}
+  nav a{flex:1;min-width:0;padding:8px 0;color:var(--muted);font-size:10px;text-align:center;white-space:nowrap}
   nav a svg{display:block;width:22px;height:22px;margin:0 auto 3px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
   nav a.on{color:var(--terra)}
+  .sel{width:100%;padding:15px;border-radius:14px;border:1px solid var(--line);background:var(--card);font-size:17px;margin-top:2px;appearance:none;-webkit-appearance:none}
+  .hint{font-size:12px;color:var(--muted)}
+  .person{display:block}
+  .person b{font-weight:500;font-size:16px;display:block}
+  .person>span{font-size:13px;color:var(--muted)}
+  .person.off{opacity:.55}
+  .person .pt{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .person .pt span{font-size:13px;color:var(--olive);flex:none}
+  .pbar{height:7px;border-radius:99px;background:var(--card2);margin-top:8px;overflow:hidden}
+  .pbar i{display:block;height:100%;background:var(--terra);border-radius:99px}
+  .attsum{display:flex;align-items:center;gap:16px;background:var(--terra);border-color:var(--terra);color:#fff}
+  .attsum .big{font-size:38px;font-weight:500;letter-spacing:-.02em;flex:none}
+  .attsum .info{flex:1;min-width:0}.attsum b{font-weight:500;display:block}.attsum span{font-size:13px;opacity:.8}
+  .attsum .pbar{background:rgba(255,255,255,.2)}.attsum .pbar i{background:#fff}
+  .seg{display:flex;gap:4px;background:var(--card2);border-radius:14px;padding:4px;margin:4px 0 12px}
+  .seg button{flex:1;border:0;background:none;padding:9px 0;border-radius:11px;font-size:14px;color:var(--muted);cursor:pointer}
+  .seg button.on{background:var(--card);color:var(--terra);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .block{padding:14px 14px 6px}
+  .block .bh{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:6px}
+  .block .bh b{font-weight:500;font-size:16px}
+  .block .bh span{font-size:13px;color:var(--muted);flex:none}.block .bh span.ok{color:var(--terra);font-weight:500}
+  .it{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+  .it.tap{cursor:pointer}.it.busy{opacity:.45;pointer-events:none}
+  .it .ck{flex:none;width:24px;height:24px;border-radius:8px;border:1.6px solid var(--olive);display:flex;align-items:center;justify-content:center;margin-top:-1px}
+  .it.done .ck{background:var(--terra);border-color:var(--terra)}
+  .it .ck svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  .it .tx{flex:1;min-width:0;font-size:15px;line-height:1.35}
+  .it.done .tx>span{color:var(--muted)}
+  .it .tx small{display:block;font-size:12px;color:var(--olive);margin-top:3px}
+  .it .mat{flex:none;font-size:12px;color:var(--terra);border:1px solid var(--line);border-radius:99px;padding:3px 9px;background:var(--card2)}
+  .form .chk{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--text)}
+  .form .chk input{width:20px;height:20px;margin:0;display:inline-block}
   .toast{position:fixed;z-index:20;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 96px);background:var(--deep);color:#fff;padding:10px 16px;border-radius:14px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.18);max-width:90vw;text-align:center}
 </style>
 </head>
@@ -147,7 +179,7 @@
 <div class="appbg" id="appbg"></div>
 <div class="wrap">
   <header>
-    <div class="top"><img class="logo" src="logo.png" alt="DZIRO"><span class="ttl">База кальянщика</span><span class="sp"></span><a class="ed-badge" id="edBadge" href="#editor" hidden>редактор</a></div>
+    <div class="top"><img class="logo" src="logo.png" alt="DZIRO"><span class="ttl">База кальянщика</span><span class="sp"></span><a class="ed-badge" id="edBadge" href="#me" hidden></a></div>
     <div class="search" id="searchBox">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="q" type="text" enterkeyhint="search" placeholder="Вкус, бренд, микс, правило…" aria-label="Поиск по базе" autocomplete="off">
@@ -175,6 +207,9 @@ const ICON = {
   find:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/></svg>',
   recent:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg>',
   editor:'<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
+  att:'<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4v-.5h6V4"/><path d="M8.5 11.5l2 2 4-4M8.5 17h7"/></svg>',
+  me:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>',
+  team:'<svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5"/><circle cx="17" cy="10" r="2.4"/><path d="M16.5 14.6c2.2 0 3.7 1.2 4.2 3.4"/></svg>',
   folder:'<svg viewBox="0 0 24 24"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4.2l2 2h8.8A1.5 1.5 0 0 1 21 9.5v8A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/></svg>'
 };
 const SEC_ICON = name => {
@@ -190,8 +225,8 @@ const SEC_ICON = name => {
   return '<svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg>';
 };
 
-let S = { data: null, pin: null, q: '', syncing: false, offline: false, limit: 120, delAsk: false, scroll: {} };
-try { S.pin = localStorage.getItem(LS + '_pin') || null; } catch (e) {}
+let S = { data: null, auth: null, user: null, att: {}, names: null, accs: null, q: '', syncing: false, offline: false, limit: 120, delAsk: false, scroll: {} };
+try { const a = JSON.parse(localStorage.getItem(LS + '_auth') || 'null'); if (a && a.auth) { S.auth = a.auth; S.user = a.user; } localStorage.removeItem(LS + '_pin'); } catch (e) {}
 
 async function api(body) {
   const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify(body) });
@@ -276,18 +311,19 @@ const go = h => { location.hash = h; };
 /* ---------- Отрисовка ---------- */
 function render(keepScroll) {
   const r = route();
-  const tab = { home: 'home', s: 'home', a: 'home', find: 'find', recent: 'recent', editor: 'editor', e: 'editor', new: 'editor' }[r.v] || 'home';
-  const tabs = [['home', '#', 'Разделы'], ['find', '#find', 'Поиск'], ['recent', '#recent', 'Новое'], ['editor', '#editor', S.pin ? 'Редактор' : 'Вход']];
+  const tab = { home: 'home', s: 'home', a: 'home', find: 'find', recent: 'recent', att: 'att', me: 'me', editor: 'me', team: 'me', acc: 'me', e: 'home', new: 'home' }[r.v] || 'home';
+  const tabs = [['home', '#', 'Разделы'], ['find', '#find', 'Поиск'], ['recent', '#recent', 'Новое'], ['att', '#att', 'Аттестация'], ['me', '#me', S.user ? 'Профиль' : 'Вход']];
   $('#nav').innerHTML = tabs.map(([k, h, t]) => `<a href="${h}" class="${tab === k ? 'on' : ''}">${ICON[k]}${t}</a>`).join('');
-  $('#edBadge').hidden = !S.pin;
-  $('#searchBox').hidden = ['e', 'new', 'editor'].includes(r.v);
+  $('#edBadge').hidden = !S.user; if (S.user) $('#edBadge').textContent = S.user.name.split(' ')[0];
+  $('#searchBox').hidden = ['e', 'new', 'editor', 'me', 'att', 'team', 'acc'].includes(r.v);
   $('#sync').innerHTML = S.syncing ? '<div class="syncbar">обновляю…</div>' : S.offline ? '<div class="syncbar off">нет связи — показана сохранённая база</div>' : '';
   if (!S.data) { $('#main').innerHTML = '<div class="spin">Загрузка базы…</div>'; return; }
-  const view = { home: viewHome, s: viewSection, a: viewDoc, find: viewFind, recent: viewRecent, editor: viewEditor, e: viewEdit, new: viewEdit }[r.v] || viewHome;
+  const view = { home: viewHome, s: viewSection, a: viewDoc, find: viewFind, recent: viewRecent, editor: viewMe, me: viewMe, att: viewAtt, team: viewTeam, acc: viewAcc, e: viewEdit, new: viewEdit }[r.v] || viewHome;
   const y = window.scrollY;
   $('#main').innerHTML = view(r);
   if (keepScroll) window.scrollTo(0, y);
   if (r.v === 'e' || r.v === 'new') bindEdit();
+  if (r.v === 'acc') bindAcc();
 }
 
 function itemHtml(a, showWhere) {
@@ -308,7 +344,7 @@ function folderCards(sec, paths, inSec) {
     return `<a class="folder" href="${secHref(sec, p)}">${ICON.folder}<b>${esc(p.split('/').pop())}</b><span>${c} ${plural(c)}</span></a>`;
   }).join('') + '</div>';
 }
-const addBtn = (sec, folder) => S.pin ? `<div class="addbar"><a class="btn" href="#new/${E(sec || '')}/${E(folder || '')}">+ Статья</a></div>` : '';
+const addBtn = (sec, folder) => canEdit() ? `<div class="addbar"><a class="btn" href="#new/${E(sec || '')}/${E(folder || '')}">+ Статья</a></div>` : '';
 
 function viewHome() {
   const cnt = n => S.arts.filter(a => a.section === n).length;
@@ -358,7 +394,7 @@ function viewSection(r) {
   return out;
 }
 function emptyHtml(q) {
-  return `<div class="empty"><b>${q ? 'Ничего не нашлось' : 'Здесь пока пусто'}</b>${q ? 'Попробуй другое слово: название вкуса, бренда или правила.' : S.pin ? 'Нажми «+ Статья», чтобы добавить первую запись.' : 'Скоро здесь появятся материалы.'}</div>`;
+  return `<div class="empty"><b>${q ? 'Ничего не нашлось' : 'Здесь пока пусто'}</b>${q ? 'Попробуй другое слово: название вкуса, бренда или правила.' : canEdit() ? 'Нажми «+ Статья», чтобы добавить первую запись.' : 'Скоро здесь появятся материалы.'}</div>`;
 }
 
 function viewDoc(r) {
@@ -369,7 +405,7 @@ function viewDoc(r) {
     ${(a.tags || []).length ? `<div class="tags" style="margin:8px 0 14px">${a.tags.map(t => `<button class="tag" onclick="findTag(this.textContent)">${esc(t)}</button>`).join('')}</div>` : '<div style="height:10px"></div>'}
     <div class="body">${md(a.body)}</div>
     <div class="foot"><span class="upd">Обновлено ${fmtDate(a.updatedAt)}</span>
-    ${S.pin ? (S.delAsk ? `<span class="confirm">Удалить статью? <button class="btn danger" onclick="delArticle('${esc(a.id)}',this)">Да</button><button class="btn ghost" onclick="S.delAsk=false;render(true)">Нет</button></span>`
+    ${canEdit() ? (S.delAsk ? `<span class="confirm">Удалить статью? <button class="btn danger" onclick="delArticle('${esc(a.id)}',this)">Да</button><button class="btn ghost" onclick="S.delAsk=false;render(true)">Нет</button></span>`
       : `<a class="btn ghost" href="#e/${E(a.id)}">Редактировать</a><button class="btn danger" onclick="S.delAsk=true;render(true)">Удалить</button>`) : ''}</div></article>`;
 }
 
@@ -396,33 +432,185 @@ function viewRecent() {
   return `<h2>Новое</h2><div class="sub">Последние добавленные и изменённые статьи</div>` + (list.length ? list.map(a => itemHtml(a, true)).join('') : emptyHtml());
 }
 
-function viewEditor() {
-  if (S.pin) return `<h2>Редактор</h2><div class="sub">Режим редактора включён на этом устройстве</div>
-    <div class="card"><b style="font-weight:500">Как добавить статью</b><div class="sub" style="margin:4px 0 12px">Открой раздел или папку и нажми «+ Статья». Внутри статьи — «Редактировать» и «Удалить».</div>
-    <a class="btn wide" href="#new//">+ Новая статья</a></div>
-    <button class="btn ghost wide" onclick="logoutEd()">Выйти из режима редактора</button>`;
-  return `<h2>Вход для редактора</h2><div class="sub">Смотреть базу может каждый. Добавлять и править статьи — только по коду редактора.</div>
-    <div class="card pinbox"><input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="Код редактора" onkeydown="if(event.key==='Enter')loginEd()">
-    <button class="btn wide" id="pinGo" onclick="loginEd()">Войти</button><div class="err" id="pinErr"></div></div>`;
+/* ---------- Аккаунты ---------- */
+const ROLE_LIST = ['Кальянный мастер', 'Спутник', 'Бармен', 'Стажёр', 'Повар', 'Менеджер'];
+const PROG_LIST = ['Кальянный мастер', 'Спутник', 'Бармен', 'Повар'];
+const canEdit = () => !!(S.user && S.user.mgr);
+const authBody = () => S.auth ? { name: S.auth.name, pin: S.auth.pin } : {};
+function saveAuth() { try { if (S.auth) localStorage.setItem(LS + '_auth', JSON.stringify({ auth: S.auth, user: S.user })); else localStorage.removeItem(LS + '_auth'); } catch (e) {} }
+
+function loginForm(title, sub) {
+  const names = S.names || [];
+  if (!S.names) loadNames();
+  return `<h2>${title}</h2><div class="sub">${sub}</div>
+    <div class="card pinbox">
+      <select id="lname" class="sel"><option value="">${names.length ? 'Кто ты?' : 'Загружаю имена…'}</option>${names.map(n => `<option>${esc(n)}</option>`).join('')}</select>
+      <input id="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="Код" onkeydown="if(event.key==='Enter')login()">
+      <button class="btn wide" id="pinGo" onclick="login()">Войти</button><div class="err" id="pinErr"></div></div>`;
 }
-async function loginEd() {
-  const v = ($('#pin').value || '').trim(); if (!v) return;
+async function loadNames() {
+  try { const r = await api({ action: 'names' }); if (r.ok) { S.names = r.names; const sel = $('#lname'); if (sel && !sel.value) render(true); } } catch (e) {}
+}
+async function login() {
+  const name = $('#lname').value, pin = ($('#pin').value || '').trim();
+  if (!name || !pin) { $('#pinErr').textContent = 'Выбери имя и введи код'; return; }
   $('#pinGo').disabled = true; $('#pinErr').textContent = '';
   try {
-    const r = await api({ action: 'check', pin: v });
-    if (r.ok && r.valid) { S.pin = v; try { localStorage.setItem(LS + '_pin', v); } catch (e) {} toast('Режим редактора включён'); render(); }
-    else { $('#pinErr').textContent = r.error || 'Неверный код'; $('#pinGo').disabled = false; }
+    const r = await api({ action: 'login', name, pin });
+    if (!r.ok) { $('#pinErr').textContent = r.error; $('#pinGo').disabled = false; return; }
+    S.auth = { name, pin }; S.user = r.user; S.att = {}; saveAuth();
+    toast('Привет, ' + r.user.name + '!'); render();
   } catch (e) { $('#pinErr').textContent = 'Нет связи с сервером'; $('#pinGo').disabled = false; }
 }
-function logoutEd() { S.pin = null; try { localStorage.removeItem(LS + '_pin'); } catch (e) {} toast('Вы вышли из режима редактора'); render(); }
+function logout() { S.auth = null; S.user = null; S.att = {}; S.accs = null; saveAuth(); toast('Ты вышел из аккаунта'); go('#me'); render(); }
 function onErr(msg) {
-  if (/код редактора/i.test(msg || '')) { S.pin = null; try { localStorage.removeItem(LS + '_pin'); } catch (e) {} toast('Код редактора изменился — войди заново'); go('#editor'); return; }
+  if (/неверное имя или код|код редактора/i.test(msg || '')) { S.auth = null; S.user = null; saveAuth(); toast('Код изменился — войди заново'); go('#me'); return; }
   toast(msg || 'Не получилось. Попробуй ещё раз');
+}
+
+function viewMe() {
+  if (!S.user) return loginForm('Вход', 'Смотреть базу может каждый. Вход нужен, чтобы видеть свою аттестацию, а менеджерам — чтобы править статьи и принимать аттестацию.');
+  const u = S.user;
+  return `<h2>${esc(u.name)}</h2><div class="sub">${esc(u.role)}${u.program && u.program !== u.role ? ' · учится на: ' + esc(u.program) : ''}</div>
+    ${u.program ? `<a class="card seccard" href="#att"><span class="ic">${ICON.att}</span><span class="info"><b>Моя аттестация</b><span>Что сдано и что осталось</span></span></a>` : ''}
+    ${u.mgr ? `<a class="card seccard" href="#att"><span class="ic">${ICON.att}</span><span class="info"><b>Аттестация команды</b><span>Отмечать сданные пункты</span></span></a>
+      <a class="card seccard" href="#team"><span class="ic">${ICON.team}</span><span class="info"><b>Команда</b><span>Добавить человека, роли и коды</span></span></a>
+      <a class="card seccard" href="#new//"><span class="ic">${ICON.editor}</span><span class="info"><b>Новая статья</b><span>Или «+ Статья» внутри раздела</span></span></a>` : ''}
+    <button class="btn ghost wide" style="margin-top:8px" onclick="logout()">Выйти из аккаунта</button>`;
+}
+
+/* ---------- Команда ---------- */
+async function loadAccs() {
+  try { const r = await api({ action: 'accounts', ...authBody() }); if (!r.ok) return onErr(r.error); S.accs = r.accounts; render(true); }
+  catch (e) { toast('Нет связи с сервером'); }
+}
+function viewTeam() {
+  if (!canEdit()) return `<div class="empty"><b>Только для менеджеров</b><br><a class="btn" href="#me">Войти</a></div>`;
+  if (!S.accs) { loadAccs(); return '<div class="spin">Загружаю команду…</div>'; }
+  const order = ['Владелец', 'Менеджер', ...ROLE_LIST.filter(r => r !== 'Менеджер')];
+  let out = backBtn('#me', 'Профиль') + `<h2>Команда</h2><div class="sub">${S.accs.filter(a => a.active).length} активных аккаунтов</div>
+    <div class="addbar"><a class="btn" href="#acc/">+ Добавить человека</a></div>`;
+  order.forEach(role => {
+    const list = S.accs.filter(a => a.role === role);
+    if (!list.length) return;
+    out += `<div class="sec">${esc(role)}</div>` + list.map(a => `<a class="card person ${a.active ? '' : 'off'}" href="#acc/${E(a.name)}">
+      <b>${esc(a.name)}</b><span>${a.role === 'Стажёр' ? 'программа: ' + esc(a.program).toLowerCase() : ''}${a.active ? '' : ' отключён'}</span></a>`).join('');
+  });
+  return out;
+}
+function viewAcc(r) {
+  if (!canEdit()) return `<div class="empty"><b>Только для менеджеров</b></div>`;
+  if (!S.accs) { loadAccs(); return '<div class="spin">Загрузка…</div>'; }
+  const a = r.a ? S.accs.find(x => x.name === r.a) : { name: '', role: 'Стажёр', program: 'Кальянный мастер', active: true };
+  if (!a) return `<div class="empty"><b>Аккаунт не найден</b></div>`;
+  if (a.role === 'Владелец') return backBtn('#team', 'Команда') + `<div class="empty"><b>Аккаунт владельца</b>Меняется только в таблице</div>`;
+  const owner = S.user.role === 'Владелец';
+  if (a.role === 'Менеджер' && !owner) return backBtn('#team', 'Команда') + `<div class="empty"><b>${esc(a.name)}</b>Менеджеров меняет только владелец</div>`;
+  const roles = ROLE_LIST.filter(x => x !== 'Менеджер' || owner);
+  return backBtn('#team', 'Команда') + `<h2>${r.a ? esc(a.name) : 'Новый человек'}</h2><div class="sub">${r.a ? 'Изменить роль, код или отключить доступ' : 'Код передай человеку лично'}</div>
+  <form class="form" id="accForm" data-orig="${esc(r.a || '')}">
+    <label>Имя и фамилия<input id="a-name" required maxlength="60" value="${esc(a.name)}" placeholder="Например: Анна Смирнова"></label>
+    <label>Роль<select id="a-role">${roles.map(x => `<option ${x === a.role ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
+    <label id="a-progw" ${a.role === 'Стажёр' ? '' : 'hidden'}>Программа обучения<select id="a-prog">${PROG_LIST.map(x => `<option ${x === a.program ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
+    <label>Код для входа <span class="hint">— 4–8 цифр${r.a ? ', оставь пустым, чтобы не менять' : ''}</span><input id="a-code" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="${r.a ? '••••' : 'Например: 4821'}"></label>
+    ${r.a ? `<label class="chk"><input type="checkbox" id="a-active" ${a.active ? 'checked' : ''}> Доступ включён</label>` : ''}
+    <div class="err" id="a-err" style="text-align:left"></div>
+    <div class="row"><button class="btn" type="submit" id="a-save">Сохранить</button><a class="btn ghost" href="#team">Отмена</a></div>
+  </form>`;
+}
+function bindAcc() {
+  const f = $('#accForm'); if (!f) return;
+  $('#a-role').onchange = () => { $('#a-progw').hidden = $('#a-role').value !== 'Стажёр'; };
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const account = { orig: f.dataset.orig || '', name: $('#a-name').value.trim(), role: $('#a-role').value, program: $('#a-prog').value,
+      code: $('#a-code').value.trim(), active: $('#a-active') ? $('#a-active').checked : true };
+    $('#a-save').disabled = true; $('#a-err').textContent = '';
+    try {
+      const r = await api({ action: 'saveAccount', ...authBody(), account });
+      if (!r.ok) { $('#a-save').disabled = false; $('#a-err').textContent = r.error; if (/неверное имя или код/i.test(r.error)) onErr(r.error); return; }
+      S.accs = r.accounts; S.names = null; S.att = {}; toast('Сохранено'); location.replace('#team');
+    } catch (err) { $('#a-save').disabled = false; $('#a-err').textContent = 'Нет связи с сервером'; }
+  };
+}
+
+/* ---------- Аттестация ---------- */
+async function loadAtt(person) {
+  const key = person || '';
+  try {
+    const r = await api({ action: 'att', ...authBody(), person: person || undefined });
+    if (!r.ok) return onErr(r.error);
+    r._t = Date.now(); S.att[key] = r; if (!person) { S.user = r.user; saveAuth(); }
+    render(true);
+  } catch (e) { S.att[key] = S.att[key] || { err: true }; render(true); }
+}
+function bar(done, total) { const p = total ? Math.round(done / total * 100) : 0; return `<div class="pbar"><i style="width:${p}%"></i></div>`; }
+function viewAtt(r) {
+  if (!S.user) return loginForm('Аттестация', 'Войди под своим именем, чтобы увидеть, что уже сдано и что осталось.');
+  const person = S.user.mgr ? r.a : '';
+  const d = S.att[person || ''];
+  if (!d) { loadAtt(person); return '<div class="spin">Загружаю аттестацию…</div>'; }
+  if (d._t && Date.now() - d._t > 20000) { d._t = Date.now(); loadAtt(person); }
+  if (d.err) return `<div class="empty"><b>Нет связи с сервером</b><br><button class="btn" onclick="S.att={};render()">Повторить</button></div>`;
+  if (S.user.mgr && !person) return viewAttTeam(d);
+  return viewAttPerson(d, S.user.mgr);
+}
+function viewAttTeam(d) {
+  const people = d.people || [];
+  const progs = [...new Set(people.map(p => p.program).filter(Boolean))];
+  let out = `<h2>Аттестация</h2><div class="sub">Выбери сотрудника, чтобы отметить сданные пункты</div>
+    <div class="addbar"><a class="btn ghost" href="#team">Команда</a>&nbsp;<a class="btn" href="#acc/">+ Человек</a></div>`;
+  if (!people.length) return out + `<div class="empty"><b>Пока никого нет</b>Добавь сотрудников во вкладке «Команда»</div>`;
+  progs.concat(people.some(p => !p.program) ? [''] : []).forEach(pg => {
+    const list = people.filter(p => p.program === pg);
+    out += `<div class="sec">${pg ? esc(pg) : 'Без программы'}</div>` + list.map(p => `<a class="card person" href="#att/${E(p.name)}">
+      <div class="pt"><b>${esc(p.name)}</b><span>${p.role === 'Стажёр' ? 'стажёр · ' : ''}${p.done} из ${p.total}</span></div>${bar(p.done, p.total)}</a>`).join('');
+  });
+  return out;
+}
+function viewAttPerson(d, mgr) {
+  const p = d.person, items = d.items || [], done = d.done || {};
+  const n = items.filter(x => done[x.id]).length;
+  const f = S.attFilter || 'all';
+  let out = mgr ? backBtn('#att', 'Аттестация') : '';
+  out += `<h2>${mgr ? esc(p.name) : 'Моя аттестация'}</h2><div class="sub">${esc(p.program ? 'Программа: ' + p.program : 'Программа не назначена')}</div>`;
+  if (!items.length) return out + `<div class="empty"><b>Пунктов пока нет</b>${mgr ? 'Добавь пункты программы на листе «Аттестация» в таблице' : 'Менеджер скоро добавит программу'}</div>`;
+  const pct = Math.round(n / items.length * 100);
+  out += `<div class="card attsum"><div class="big">${pct}%</div><div class="info"><b>Сдано ${n} из ${items.length}</b><span>${n === items.length ? 'Аттестация пройдена полностью' : 'Осталось ' + (items.length - n)}</span>${bar(n, items.length)}</div></div>
+    <div class="seg">${[['all', 'Все'], ['left', 'Осталось'], ['done', 'Сдано']].map(([k, t]) => `<button class="${f === k ? 'on' : ''}" onclick="S.attFilter='${k}';render(true)">${t}</button>`).join('')}</div>
+    ${mgr ? '<div class="hint" style="margin:0 2px 10px">Нажми на пункт, чтобы отметить сдачу или снять отметку</div>' : ''}`;
+  const blocks = [];
+  items.forEach(x => { let b = blocks.find(y => y.name === x.block); if (!b) blocks.push(b = { name: x.block, items: [] }); b.items.push(x); });
+  blocks.forEach(b => {
+    const bn = b.items.filter(x => done[x.id]).length;
+    const vis = b.items.filter(x => f === 'all' || (f === 'done') === !!done[x.id]);
+    if (!vis.length) return;
+    out += `<div class="card block"><div class="bh"><b>${esc(b.name)}</b><span class="${bn === b.items.length ? 'ok' : ''}">${bn}/${b.items.length}</span></div>` +
+      vis.map(x => {
+        const dd = done[x.id];
+        const meta = dd ? `сдано ${dd.at ? new Date(dd.at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) : ''}${dd.by ? ' · принял(а) ' + esc(dd.by) : ''}` : '';
+        const art = x.art && S.arts && S.arts.some(a => a.id === x.art) ? `<a class="mat" href="#a/${E(x.art)}" onclick="event.stopPropagation()">материал</a>` : '';
+        return `<div class="it ${dd ? 'done' : ''} ${mgr ? 'tap' : ''}" ${mgr ? `onclick="markAtt('${esc(p.name).replace(/'/g, '&#39;')}','${esc(x.id)}',${dd ? 'false' : 'true'},this)"` : ''}>
+          <span class="ck">${dd ? '<svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg>' : ''}</span>
+          <span class="tx"><span>${esc(x.title)}</span>${meta ? `<small>${meta}</small>` : ''}</span>${art}</div>`;
+      }).join('') + '</div>';
+  });
+  return out;
+}
+async function markAtt(person, id, doneFlag, el) {
+  if (el.classList.contains('busy')) return;
+  el.classList.add('busy');
+  try {
+    const r = await api({ action: 'mark', ...authBody(), person, id, done: doneFlag });
+    if (!r.ok) { el.classList.remove('busy'); return onErr(r.error); }
+    r._t = Date.now(); S.att[person] = r; if (S.att['']) delete S.att[''];
+    toast(doneFlag ? 'Отмечено как сдано' : 'Отметка снята'); render(true);
+  } catch (e) { el.classList.remove('busy'); toast('Нет связи — отметка не сохранена'); }
 }
 
 /* ---------- Редактирование ---------- */
 function viewEdit(r) {
-  if (!S.pin) return `<div class="empty"><b>Нужен вход редактора</b><br><a class="btn" href="#editor">Войти</a></div>`;
+  if (!canEdit()) return `<div class="empty"><b>Править статьи могут менеджеры</b><br><a class="btn" href="#me">Войти</a></div>`;
   const isNew = r.v === 'new';
   const a = isNew ? { title: '', section: S.secs.some(s => s.name === r.a) ? r.a : (S.secs[0] || {}).name, folder: r.b || '', tags: [], body: '' } : S.arts.find(x => x.id === r.a);
   if (!a) return `<div class="empty"><b>Статья не найдена</b></div>`;
@@ -447,7 +635,7 @@ function bindEdit() {
     if (!art.title) return;
     $('#save').disabled = true; $('#save').textContent = 'Сохраняю…';
     try {
-      const r = await api({ action: 'save', pin: S.pin, article: art });
+      const r = await api({ action: 'save', ...authBody(), article: art });
       if (!r.ok) { $('#save').disabled = false; $('#save').textContent = 'Сохранить'; return onErr(r.error); }
       setData(r.data); saveCache(r.data); toast('Сохранено');
       location.replace('#a/' + E(r.id));
@@ -462,7 +650,7 @@ function bindEdit() {
       const rd = new FileReader();
       rd.onload = async () => {
         try {
-          const r = await api({ action: 'upload', pin: S.pin, name: file.name, type: file.type, data: String(rd.result).split(',')[1] });
+          const r = await api({ action: 'upload', ...authBody(), fileName: file.name, type: file.type, data: String(rd.result).split(',')[1] });
           if (!r.ok) { left--; status.textContent = 'Не получилось загрузить «' + file.name + '»'; return onErr(r.error); }
           const ta = $('#f-body'); if (!ta) return;
           const snip = r.file.isImage ? `![${r.file.name}](https://lh3.googleusercontent.com/d/${r.file.id})` : `[Файл: ${r.file.name}](https://drive.google.com/file/d/${r.file.id}/view)`;
@@ -479,7 +667,7 @@ function bindEdit() {
 async function delArticle(id, b) {
   b.disabled = true;
   try {
-    const r = await api({ action: 'delete', pin: S.pin, id });
+    const r = await api({ action: 'delete', ...authBody(), id });
     if (!r.ok) { b.disabled = false; return onErr(r.error); }
     const a = S.arts.find(x => x.id === id);
     setData(r.data); saveCache(r.data); S.delAsk = false; toast('Статья удалена');
