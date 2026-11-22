@@ -14,7 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>DZIRO — База кальянщика</title>
+<title>Библиотека Дзиро</title>
 <style>
   :root{
     --bg:#e9efe2; --card:#ffffff; --card2:#e1e9d8; --line:#d3dcc8;
@@ -203,7 +203,7 @@
 <div class="appbg" id="appbg"></div>
 <div class="wrap">
   <header>
-    <div class="top"><img class="logo" src="logo.png" alt="DZIRO"><span class="ttl">База кальянщика</span><span class="sp"></span><a class="bell" id="bell" href="#notes" hidden aria-label="Уведомления"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><b id="bellN" hidden></b></a><a class="ed-badge" id="edBadge" href="#me" hidden></a></div>
+    <div class="top"><img class="logo" src="logo.png" alt="DZIRO"><span class="ttl">Библиотека Дзиро</span><span class="sp"></span><a class="bell" id="bell" href="#notes" hidden aria-label="Уведомления"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><b id="bellN" hidden></b></a><a class="ed-badge" id="edBadge" href="#me" hidden></a></div>
     <div class="search" id="searchBox">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="q" type="text" enterkeyhint="search" placeholder="Вкус, бренд, микс, правило…" aria-label="Поиск по базе" autocomplete="off">
@@ -211,7 +211,7 @@
     </div>
   </header>
   <div id="sync"></div>
-  <main id="main"><div class="spin">Загрузка базы…</div></main>
+  <main id="main"><div class="spin">Загрузка библиотеки…</div></main>
 </div>
 <nav id="nav"></nav>
 <div class="toast" id="toast" hidden></div>
@@ -342,8 +342,8 @@ function render(keepScroll) {
   $('#edBadge').hidden = !S.user; if (S.user) $('#edBadge').textContent = S.user.name.split(' ')[0];
   updateBell();
   $('#searchBox').hidden = ['e', 'new', 'editor', 'me', 'att', 'team', 'acc', 'notes'].includes(r.v);
-  $('#sync').innerHTML = S.syncing ? '<div class="syncbar">обновляю…</div>' : S.offline ? '<div class="syncbar off">нет связи — показана сохранённая база</div>' : '';
-  if (!S.data) { $('#main').innerHTML = '<div class="spin">Загрузка базы…</div>'; return; }
+  $('#sync').innerHTML = S.syncing ? '<div class="syncbar">обновляю…</div>' : S.offline ? '<div class="syncbar off">нет связи — показана сохранённая библиотека</div>' : '';
+  if (!S.data) { $('#main').innerHTML = '<div class="spin">Загрузка библиотеки…</div>'; return; }
   const view = { notes: viewNotes, home: viewHome, s: viewSection, a: viewDoc, find: viewFind, recent: viewRecent, editor: viewMe, me: viewMe, att: viewAtt, team: viewTeam, acc: viewAcc, e: viewEdit, new: viewEdit }[r.v] || viewHome;
   const y = window.scrollY;
   $('#main').innerHTML = view(r);
@@ -375,7 +375,7 @@ const addBtn = (sec, folder) => canEdit() ? `<div class="addbar"><a class="btn" 
 function viewHome() {
   const cnt = n => S.arts.filter(a => a.section === n).length;
   const recent = [...S.arts].filter(a => a.updatedAt).sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 4);
-  return `<h2>Разделы</h2><div class="sub">${S.arts.length} ${plural(S.arts.length)} в базе</div>` +
+  return `<h2>Разделы</h2><div class="sub">${S.arts.length} ${plural(S.arts.length)} в библиотеке</div>` +
     S.secs.map(s => `<a class="card seccard" href="${secHref(s.name)}"><span class="ic">${SEC_ICON(s.name)}</span>
       <span class="info"><b>${esc(s.name)}</b>${s.sub ? `<span>${esc(s.sub)}</span>` : ''}</span><span class="n">${cnt(s.name)}</span></a>`).join('') +
     (recent.length ? '<div class="sec">Недавно обновлено</div>' + recent.map(a => itemHtml(a, true)).join('') : '');
@@ -495,7 +495,7 @@ function onErr(msg) {
 }
 
 function viewMe() {
-  if (!S.user) return loginForm('Вход', 'Смотреть базу может каждый. Вход нужен, чтобы видеть свою аттестацию, а менеджерам — чтобы править статьи и принимать аттестацию.');
+  if (!S.user) return loginForm('Вход', 'Смотреть библиотеку может каждый. Вход нужен, чтобы видеть свою аттестацию, а менеджерам — чтобы править статьи и принимать аттестацию.');
   const u = S.user;
   return `<h2>${esc(u.name)}</h2><div class="sub">${esc(u.role)}${u.program && u.program !== u.role ? ' · учится на: ' + esc(u.program) : ''}</div>
     ${u.program ? `<a class="card seccard" href="#att"><span class="ic">${ICON.att}</span><span class="info"><b>Моя аттестация</b><span>Что сдано и что осталось</span></span></a>` : ''}
