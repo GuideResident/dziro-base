@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#58654f">
+<meta name="theme-color" content="#8c4f30">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -183,6 +183,20 @@
   .note.new{border-color:var(--terra)}
   .note .ndot{position:absolute;top:12px;right:12px;width:8px;height:8px;border-radius:50%;background:#d9773f}
   .toast{position:fixed;z-index:20;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 96px);background:var(--deep);color:#fff;padding:10px 16px;border-radius:14px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.18);max-width:90vw;text-align:center}
+  /* ===== Единая тема DZIRO: белый и терракота ===== */
+  :root{--bg:#fbf8f4;--card:#ffffff;--card2:#f6ece4;--line:#eadfd4;--muted:#8a7f74;--terra:#8c4f30;--olive:#858059;--deep:#6e3c24;--red:#a8432a;--sage:#efd2bf}
+  .appbg .sign{stroke:#d9773f;stroke-width:2.4;opacity:.16}
+  .crumbs a{border-bottom-color:rgba(140,79,48,.3)}
+  .body a{border-bottom-color:rgba(140,79,48,.35)}
+  /* ===== Внутри приложения DZIRO ===== */
+  html.emb header{margin:0 -16px 14px;padding:14px 16px 10px;border-radius:0 0 18px 18px}
+  html.emb header .logo{display:none}
+  html.emb nav{position:static;margin:12px 0 0;max-width:none;background:rgba(239,231,220,.14);border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:14px;padding:3px}
+  html.emb nav a{color:#efd2bf;padding:6px 0;border-radius:11px;font-size:10.5px}
+  html.emb nav a svg{width:19px;height:19px;margin-bottom:2px}
+  html.emb nav a.on{background:var(--card);color:var(--terra)}
+  html.emb .wrap{padding-bottom:28px}
+  html.emb .toast{bottom:16px}
 </style>
 </head>
 <body>
@@ -203,6 +217,7 @@
 <div class="toast" id="toast" hidden></div>
 
 <script>
+if (window.top !== window.self) { document.documentElement.classList.add('emb'); document.querySelector('header').appendChild(document.getElementById('nav')); }
 /* ====== Ссылка веб-приложения Apps Script (таблица «База кальянщика») ====== */
 const API_URL = 'https://script.google.com/macros/s/AKfycbys14AHJ9b66Mke6U1Owy-GqFU8Igav5BxC7Usj6y_CwOmkLKCkDMjbToGrLqC2jJ-L/exec';
 /* ========================================================================= */
