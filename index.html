@@ -742,7 +742,9 @@ $('#qx').onclick = () => { $('#q').value = ''; S.q = ''; $('#qx').hidden = true;
 document.addEventListener('click', e => { const a = e.target.closest('nav a[href="#find"]'); if (a) setTimeout(() => $('#q').focus(), 50); });
 
 $('#appbg').innerHTML = SIGN;
+if (window.top === window.self && !/[?&]solo/.test(location.search)) { location.replace('../dziro/?go=base'); }
 render(); load();
+if (S.auth && !S.user) api({ action: 'login', ...S.auth }).then(r => { if (r && r.ok) { S.user = r.user; saveAuth(); render(); } }).catch(() => {});
 </script>
 </body>
 </html>
