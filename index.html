@@ -759,8 +759,9 @@ document.addEventListener('click', e => { const a = e.target.closest('nav a[href
 $('#appbg').innerHTML = SIGN;
 if (window.top === window.self && !/[?&]solo/.test(location.search)) { location.replace('../dziro/?go=base'); }
 // Библиотека пока закрыта: открыта только этим людям (имя как в листе «Команда»)
-const LIB_USERS = ['Добежин Ярослав'];
-const libOpen = () => !!(S.auth && LIB_USERS.some(n => n.toLowerCase() === String(S.auth.name || '').toLowerCase()));
+const LIB_USERS = ['Ярослав Добежин'];
+const libKey = n => String(n || '').toLowerCase().replace(/ё/g, 'е').split(/\s+/).filter(Boolean).sort().join(' ');
+const libOpen = () => !!(S.auth && S.auth.name && LIB_USERS.some(n => libKey(n) === libKey(S.auth.name)));
 if (!libOpen()) {
   S.auth = null;
   document.querySelector('.wrap').innerHTML = '<div style="padding:80px 24px;text-align:center;color:var(--muted)"><h2 style="color:var(--text)">Библиотека Дзиро</h2>Раздел скоро откроется</div>';
