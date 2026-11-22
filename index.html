@@ -197,6 +197,17 @@
   html.emb nav a.on{background:var(--card);color:var(--terra)}
   html.emb .wrap{padding-bottom:28px}
   html.emb .toast{bottom:16px}
+  .pres{margin:4px 0 16px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card)}
+  .pres-f{position:relative;aspect-ratio:16/10;background:#1f1d1b}
+  .pres-f iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .pres-b{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;font-size:14px}
+  .pres-b span{font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pres-b a{flex:none;border:0!important;font-weight:500}
+  .gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:0;margin:12px 0 4px;border-radius:14px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .gal::-webkit-scrollbar{display:none}
+  .gal .gi{flex:0 0 100%;scroll-snap-align:center}
+  .gal img{margin:0;width:100%}
+  .gcnt{font-size:12px;color:var(--muted);text-align:center;margin:0 0 12px}
 </style>
 </head>
 <body>
@@ -280,35 +291,57 @@ async function load() {
 }
 
 /* ---------- Разметка текста ---------- */
+// Ссылки Google Диска → картинка / встроенный просмотр
+const driveId = u => { const m = String(u).match(/\/d\/([\w-]{20,})/) || String(u).match(/[?&]id=([\w-]{20,})/); return m ? m[1] : ''; };
+const imgUrl = u => (/drive\.google\.com|docs\.google\.com/.test(u) && driveId(u)) ? 'https://lh3.googleusercontent.com/d/' + driveId(u) : u;
+const embedUrl = u => {
+  const id = driveId(u);
+  if (/docs\.google\.com\/presentation/.test(u) && id) return 'https://docs.google.com/presentation/d/' + id + '/embed?start=false&loop=false';
+  if (/drive\.google\.com|docs\.google\.com/.test(u) && id) return 'https://drive.google.com/file/d/' + id + '/preview';
+  return u;
+};
+const isPres = (kind, name, url) => kind === 'Презентация' || /\.(pptx?|key|odp)\s*$/i.test(name) || /docs\.google\.com\/presentation/.test(url);
+function presBlock(name, url) {
+  return `<div class="pres"><div class="pres-f"><iframe src="${esc(embedUrl(url))}" title="${esc(name)}" allow="fullscreen" allowfullscreen loading="lazy"></iframe></div>
+    <div class="pres-b"><span>${esc(name.replace(/\.(pptx?|key|odp|pdf)$/i, ''))}</span><a href="${esc(url)}" target="_blank" rel="noopener">Открыть на весь экран</a></div></div>`;
+}
+function galBlock(imgs) {
+  const tag = ([alt, url]) => `<a href="${esc(imgUrl(url))}" target="_blank" rel="noopener" style="border:0"><img src="${esc(imgUrl(url))}" alt="${esc(alt)}" loading="lazy"></a>`;
+  if (imgs.length === 1) return tag(imgs[0]);
+  return `<div class="gal" onscroll="const n=Math.round(this.scrollLeft/this.clientWidth)+1;this.nextElementSibling.textContent=n+' / ${imgs.length}'">${imgs.map(i => `<div class="gi">${tag(i)}</div>`).join('')}</div><div class="gcnt">1 / ${imgs.length} · листай вбок</div>`;
+}
 function inline(s) {
   s = esc(s);
   return s.replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
     .replace(/(^|[\s(])_([^_]+)_/g, '$1<i>$2</i>')
-    .replace(/!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener" style="border:0"><img src="$2" alt="$1" loading="lazy"></a>')
+    .replace(/!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/g, (m, a, u) => { const v = imgUrl(u); return `<a href="${v}" target="_blank" rel="noopener" style="border:0"><img src="${v}" alt="${a}" loading="lazy"></a>`; })
     .replace(/\[Файл: ([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a class="file" href="$2" target="_blank" rel="noopener">$1</a>')
     .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
     .replace(/(^|[\s(])(https?:\/\/[^\s<]+)/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
 }
 function md(src) {
-  const lines = String(src || '').split(/\r?\n/); let out = '', list = null, para = [], tbl = [];
+  const lines = String(src || '').split(/\r?\n/); let out = '', list = null, para = [], tbl = [], imgs = [];
+  const flushG = () => { if (imgs.length) { out += galBlock(imgs); imgs = []; } };
   const flushP = () => { if (para.length) { out += '<p>' + para.map(inline).join('<br>') + '</p>'; para = []; } };
   const flushL = () => { if (list) { out += '</' + list + '>'; list = null; } };
   const flushT = () => { if (tbl.length) {
     const rows = tbl.filter(r => !/^\s*\|?\s*:?-{2,}/.test(r)).map(r => r.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim()));
     out += '<div class="tbl"><table>' + rows.map((r, i) => '<tr>' + r.map(c => i ? `<td>${inline(c)}</td>` : `<th>${inline(c)}</th>`).join('') + '</tr>').join('') + '</table></div>'; tbl = []; } };
   for (const l of lines) {
-    if (/^\s*\|/.test(l)) { flushP(); flushL(); tbl.push(l); continue; } else flushT();
     let m;
+    if ((m = l.match(/^\s*!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)\s*$/))) { flushP(); flushL(); flushT(); imgs.push([m[1], m[2]]); continue; } else if (l.trim()) flushG();
+    if ((m = l.match(/^\s*\[(Презентация|Файл): ([^\]]+)\]\((https?:\/\/[^)\s]+)\)\s*$/)) && isPres(m[1], m[2], m[3])) { flushP(); flushL(); flushT(); out += presBlock(m[2], m[3]); continue; }
+    if (/^\s*\|/.test(l)) { flushP(); flushL(); tbl.push(l); continue; } else flushT();
     if ((m = l.match(/^(#{1,3})\s+(.*)/))) { flushP(); flushL(); const h = m[1].length === 1 ? 2 : 3; out += `<h${h}>${inline(m[2])}</h${h}>`; }
     else if ((m = l.match(/^\s*[-*•]\s+(.*)/))) { flushP(); if (list !== 'ul') { flushL(); out += '<ul>'; list = 'ul'; } out += `<li>${inline(m[1])}</li>`; }
     else if ((m = l.match(/^\s*(\d+)[.)]\s+(.*)/))) { flushP(); if (list !== 'ol') { flushL(); out += '<ol>'; list = 'ol'; } out += `<li value="${m[1]}">${inline(m[2])}</li>`; }
     else if (!l.trim()) { flushP(); flushL(); }
     else { flushL(); para.push(l); }
   }
-  flushP(); flushL(); flushT(); return out;
+  flushP(); flushL(); flushT(); flushG(); return out;
 }
-const plain = s => String(s || '').replace(/!\[[^\]]*\]\([^)]*\)/g, ' ').replace(/\[(?:Файл: )?([^\]]*)\]\([^)]*\)/g, '$1').replace(/[#*_`|>-]/g, ' ').replace(/\s+/g, ' ').trim();
+const plain = s => String(s || '').replace(/!\[[^\]]*\]\([^)]*\)/g, ' ').replace(/\[(?:Файл: |Презентация: )?([^\]]*)\]\([^)]*\)/g, '$1').replace(/[#*_`|>-]/g, ' ').replace(/\s+/g, ' ').trim();
 const fmtDate = t => t ? new Date(t).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 function plural(n) { const m = n % 10, h = n % 100; return m === 1 && h !== 11 ? 'статья' : m >= 2 && m <= 4 && (h < 12 || h > 14) ? 'статьи' : 'статей'; }
 
