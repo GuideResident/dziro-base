@@ -230,7 +230,8 @@
 <script>
 if (window.top !== window.self) { document.documentElement.classList.add('emb'); document.querySelector('header').appendChild(document.getElementById('nav')); }
 /* ====== Ссылка веб-приложения Apps Script (таблица «База кальянщика») ====== */
-const API_URL = 'https://script.google.com/macros/s/AKfycbys14AHJ9b66Mke6U1Owy-GqFU8Igav5BxC7Usj6y_CwOmkLKCkDMjbToGrLqC2jJ-L/exec';
+const API_URL = 'https://app.itdziro.ru/srv/base';
+const API_FALLBACK = 'https://script.google.com/macros/s/AKfycbys14AHJ9b66Mke6U1Owy-GqFU8Igav5BxC7Usj6y_CwOmkLKCkDMjbToGrLqC2jJ-L/exec';
 /* ========================================================================= */
 
 const LS = 'dziro_base';
@@ -265,7 +266,9 @@ let S = { data: null, auth: null, user: null, att: {}, names: null, accs: null, 
 try { const a = JSON.parse(localStorage.getItem(LS + '_auth') || 'null'); if (a && a.auth) { S.auth = a.auth; S.user = a.user; } localStorage.removeItem(LS + '_pin'); } catch (e) {}
 
 async function api(body) {
-  const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify(body) });
+  const payload = JSON.stringify(body); let r;
+  try { r = await fetch(API_URL, { method: 'POST', body: payload }); }
+  catch (e) { r = await fetch(API_FALLBACK, { method: 'POST', body: payload }); } // сервер недоступен — запасной путь через Google
   return r.json();
 }
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 2600); }
